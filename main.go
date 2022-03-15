@@ -46,4 +46,17 @@ func main() {
 	if err := m.NamedDiff(context.Background(), os.Args[1], tbls...); err != nil {
 		log.Fatalln(err)
 	}
+	// Print out without versioned.
+	f, err := os.Create("offline.sql")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer f.Close()
+	m, err = schema.NewMigrate(&schema.WriteDriver{Driver: drv, Writer: f}, schema.WithDir(dir))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if err := m.Create(context.Background(), tbls...); err != nil {
+		log.Fatalln(err)
+	}
 }
